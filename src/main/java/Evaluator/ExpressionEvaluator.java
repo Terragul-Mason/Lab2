@@ -3,11 +3,18 @@ package Evaluator;
 import java.util.*;
 import java.util.function.Function;
 
+/**
+ * Класс для разбора и вычисления арифметических выражений.
+ * Поддерживает числовые значения, переменные, скобки, базовые арифметические операции и функции.
+ */
 public class ExpressionEvaluator {
-
+    /** Хранилище значений переменных, введённых пользователем */
     private final Map<String, Double> variables = new HashMap<>();
+
+    /** Сканер для ввода значений переменных с консоли */
     private final Scanner scanner = new Scanner(System.in);
 
+    /** Поддерживаемые функции и их реализация */
     private static final Map<String, Function<Double, Double>> FUNCTIONS = Map.of(
             "sin", Math::sin,
             "cos", Math::cos,
@@ -16,12 +23,25 @@ public class ExpressionEvaluator {
             "abs", Math::abs
     );
 
+    /**
+     * Главный метод для вычисления выражения.
+     *
+     * @param expression строка выражения (например, "2 + 3 * x")
+     * @return результат вычисления
+     * @throws IllegalArgumentException если выражение некорректно
+     */
     public double evaluate(String expression) throws IllegalArgumentException {
         List<String> tokens = tokenize(expression.replaceAll("\\s+", ""));
         List<String> rpn = toRPN(tokens);
         return evaluateRPN(rpn);
     }
 
+    /**
+     * Разбивает строку выражения на токены: числа, переменные, операторы, скобки.
+     *
+     * @param expr выражение без пробелов
+     * @return список токенов
+     */
     private List<String> tokenize(String expr) {
         List<String> tokens = new ArrayList<>();
         StringBuilder current = new StringBuilder();
@@ -52,6 +72,12 @@ public class ExpressionEvaluator {
         return tokens;
     }
 
+    /**
+     * Преобразует список токенов в обратную польскую запись (RPN).
+     *
+     * @param tokens список токенов
+     * @return выражение в RPN
+     */
     private List<String> toRPN(List<String> tokens) {
         List<String> output = new ArrayList<>();
         Stack<String> stack = new Stack<>();
@@ -98,6 +124,12 @@ public class ExpressionEvaluator {
         return output;
     }
 
+    /**
+     * Вычисляет значение выражения, записанного в обратной польской записи.
+     *
+     * @param rpn список токенов в RPN
+     * @return результат вычисления
+     */
     private double evaluateRPN(List<String> rpn) {
         Stack<Double> stack = new Stack<>();
 
@@ -130,6 +162,12 @@ public class ExpressionEvaluator {
         return stack.pop();
     }
 
+    /**
+     * Проверяет, является ли токен числом.
+     *
+     * @param token строка
+     * @return true, если это число
+     */
     private boolean isNumber(String token) {
         try {
             Double.parseDouble(token);
@@ -139,10 +177,22 @@ public class ExpressionEvaluator {
         }
     }
 
+    /**
+     * Проверяет, является ли токен переменной (не функцией).
+     *
+     * @param token строка
+     * @return true, если это переменная
+     */
     private boolean isVariable(String token) {
         return token.matches("[a-zA-Z]+") && !FUNCTIONS.containsKey(token);
     }
 
+    /**
+     * Возвращает значение переменной, запрашивая у пользователя, если оно ещё не задано.
+     *
+     * @param var имя переменной
+     * @return значение переменной
+     */
     private double getVariableValue(String var) {
         if (!variables.containsKey(var)) {
             System.out.print("Enter the value of the variable " + var + ": ");
