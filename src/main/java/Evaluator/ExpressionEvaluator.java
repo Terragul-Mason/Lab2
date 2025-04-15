@@ -45,7 +45,7 @@ public class ExpressionEvaluator {
                 tokens.add(Character.toString(ch));
                 i++;
             } else {
-                throw new IllegalArgumentException("Неверный символ: " + ch);
+                throw new IllegalArgumentException("Invalid character: " + ch);
             }
         }
 
@@ -80,18 +80,18 @@ public class ExpressionEvaluator {
                 while (!stack.isEmpty() && !stack.peek().equals("(")) {
                     output.add(stack.pop());
                 }
-                if (stack.isEmpty()) throw new IllegalArgumentException("Несогласованные скобки");
+                if (stack.isEmpty()) throw new IllegalArgumentException("Mismatched brackets");
                 stack.pop();
                 if (!stack.isEmpty() && FUNCTIONS.containsKey(stack.peek())) {
                     output.add(stack.pop());
                 }
             } else {
-                throw new IllegalArgumentException("Неизвестный токен: " + token);
+                throw new IllegalArgumentException("Unknown token: " + token);
             }
         }
 
         while (!stack.isEmpty()) {
-            if (stack.peek().equals("(")) throw new IllegalArgumentException("Несогласованные скобки");
+            if (stack.peek().equals("(")) throw new IllegalArgumentException("Mismatched brackets");
             output.add(stack.pop());
         }
 
@@ -107,18 +107,18 @@ public class ExpressionEvaluator {
             } else if (isVariable(token)) {
                 stack.push(getVariableValue(token));
             } else if (FUNCTIONS.containsKey(token)) {
-                if (stack.isEmpty()) throw new IllegalArgumentException("Недостаточно аргументов для функции");
+                if (stack.isEmpty()) throw new IllegalArgumentException("There are not enough arguments for the function");
                 double arg = stack.pop();
                 stack.push(FUNCTIONS.get(token).apply(arg));
             } else if ("+-*/^".contains(token)) {
-                if (stack.size() < 2) throw new IllegalArgumentException("Недостаточно аргументов для операции");
+                if (stack.size() < 2) throw new IllegalArgumentException("There are not enough arguments for the operation");
                 double b = stack.pop(), a = stack.pop();
                 switch (token) {
                     case "+" -> stack.push(a + b);
                     case "-" -> stack.push(a - b);
                     case "*" -> stack.push(a * b);
                     case "/" -> {
-                        if (b == 0) throw new IllegalArgumentException("Деление на ноль");
+                        if (b == 0) throw new IllegalArgumentException("Division by zero");
                         stack.push(a / b);
                     }
                     case "^" -> stack.push(Math.pow(a, b));
@@ -126,7 +126,7 @@ public class ExpressionEvaluator {
             }
         }
 
-        if (stack.size() != 1) throw new IllegalArgumentException("Ошибка вычисления выражения");
+        if (stack.size() != 1) throw new IllegalArgumentException("Error calculating the expression");
         return stack.pop();
     }
 
@@ -145,7 +145,7 @@ public class ExpressionEvaluator {
 
     private double getVariableValue(String var) {
         if (!variables.containsKey(var)) {
-            System.out.print("Введите значение переменной " + var + ": ");
+            System.out.print("Enter the value of the variable " + var + ": ");
             variables.put(var, scanner.nextDouble());
         }
         return variables.get(var);
